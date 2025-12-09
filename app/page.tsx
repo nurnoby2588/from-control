@@ -7,6 +7,7 @@ import { Autocomplete, TextField } from "@mui/material";
 import { RingLoader } from "react-spinners";
 
 type Member = {
+  _id?: string;
   idNo: string;
   fullName: string;
   phoneNumber: string;
@@ -71,7 +72,6 @@ const Home: React.FC = () => {
       setIsLoading(false);
     }
   };
-
   // Handle form submission
   const onSubmit: SubmitHandler<Member> = async (data) => {
     try {
@@ -79,14 +79,26 @@ const Home: React.FC = () => {
         ...data,
         dob: dateOfBirth ? dateOfBirth.toISOString().split("T")[0] : "", // Convert date to string
       };
+      let response;
+      if (editingMember) {
+        response = await fetch(`${BASE_URL}/api/v1/admin/update-actor/${editingMember?._id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(newMember),
+        });
+      }
 
-      const response = await fetch(`${BASE_URL}/api/v1/admin/add-actor`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newMember),
-      });
+      else {
+        response = await fetch(`${BASE_URL}/api/v1/admin/add-actor`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(newMember),
+        });
+      }
 
       if (response.ok) {
         fetchMembers(); // Refresh the members list
