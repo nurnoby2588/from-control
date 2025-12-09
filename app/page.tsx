@@ -15,7 +15,7 @@ type Member = {
   dob: string;
 };
 
-const BASE_URL = "https://actor-4rp361jo6-nurnobyrahamans-projects.vercel.app"; // Base URL for the API
+const BASE_URL = "https://actor-ashy.vercel.app/"; // Base URL for the API
 
 const Home: React.FC = () => {
   const [members, setMembers] = useState<Member[]>([]);
