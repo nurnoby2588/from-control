@@ -548,7 +548,7 @@ const Home: React.FC = () => {
         </div>
       )}
 {
-  isLosding && <RingLoader color={"#000000"} loading={isLosding} cssOverride={override} size={60} speedMultiplier={1} />
+  isLosding && <div className="fixed inset-0 flex justify-center items-center"><RingLoader color={"#000000"} loading={isLosding} cssOverride={override} size={60} speedMultiplier={1} /></div>
 }
     </div>
   );
