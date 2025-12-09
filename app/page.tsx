@@ -24,7 +24,6 @@ const override: CSSProperties = {
 };
 
 const BASE_URL = "https://actor-ashy.vercel.app"; // Base URL for the API
-// const BASE_URL = "http://localhost:8000"; // Base URL for the API
 
 const Home: React.FC = () => {
   const [members, setMembers] = useState<Member[]>([]);
@@ -39,6 +38,8 @@ const Home: React.FC = () => {
     categoryBCount: 0,
     totalActor: 0,
   });
+  const [currentPage, setCurrentPage] = useState(1); // Current page for pagination
+  const [totalPages, setTotalPages] = useState(1); // Total pages for pagination
 
   const { register, handleSubmit, reset, setValue, watch } = useForm<Member>();
 
@@ -50,7 +51,7 @@ const Home: React.FC = () => {
     try {
       setIsLoading(true);
       const response = await fetch(
-        `${BASE_URL}/api/v1/actors?search=${searchQuery}&category=${filterCategory}`
+        `${BASE_URL}/api/v1/actors?page=${currentPage}&search=${searchQuery}&category=${filterCategory}`
       );
       const data = await response.json();
       if (response.ok) {
@@ -58,9 +59,11 @@ const Home: React.FC = () => {
         const categoryACount = data?.data?.categoryACount || 0;
         const categoryBCount = data?.data?.categoryBCount || 0;
         const totalActor = data?.data?.totalActor || 0;
+        const totalPage = data?.data?.totalPage || 1;
 
         setActorCount({ categoryACount, categoryBCount, totalActor });
         setMembers(actors);
+        setTotalPages(totalPage); // Set total pages for pagination
         setIsLoading(false);
       } else {
         console.error("Error fetching members:", data.message || "Unknown error");
@@ -73,61 +76,58 @@ const Home: React.FC = () => {
       setIsLoading(false);
     }
   };
+
   // Handle form submission
   const onSubmit: SubmitHandler<Member> = async (data) => {
-  try {
-    // Prepare the member object with the date of birth
-    const newMember = {
-      ...data,
-      dob: dateOfBirth ? dateOfBirth.toISOString().split("T")[0] : editingMember?.dob || "", // Use existing dob if editing
-    };
+    try {
+      const newMember = {
+        ...data,
+        dob: dateOfBirth ? dateOfBirth.toISOString().split("T")[0] : editingMember?.dob || "", // Use existing dob if editing
+      };
 
-    let response;
+      let response;
 
-    // Check if editing or adding a member
-    if (editingMember) {
-      // Update existing member
-      response = await fetch(`${BASE_URL}/api/v1/admin/update-actor/${editingMember._id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newMember),
-      });
-    } else {
-      // Add new member
-      response = await fetch(`${BASE_URL}/api/v1/admin/add-actor`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(newMember),
-      });
-    }
-
-    // Handle response
-    if (response.ok) {
-      fetchMembers(); // Refresh the members list
       if (editingMember) {
-        alert("Member updated successfully!");
+        // Update existing member
+        response = await fetch(`${BASE_URL}/api/v1/admin/update-actor/${editingMember._id}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(newMember),
+        });
       } else {
-        alert("Member added successfully!");
+        // Add new member
+        response = await fetch(`${BASE_URL}/api/v1/admin/add-actor`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(newMember),
+        });
       }
-      setIsModalOpen(false); // Close modal
-      reset(); // Reset form fields
-      setDateOfBirth(null); // Reset date picker
-      setEditingMember(null); // Clear editing state
-    } else {
-      const errorData = await response.json();
-      console.error("Failed to process member:", errorData.message || "Unknown error");
+
+      if (response.ok) {
+        fetchMembers(); // Refresh the members list
+        if (editingMember) {
+          alert("Member updated successfully!");
+        } else {
+          alert("Member added successfully!");
+        }
+        setIsModalOpen(false); // Close modal
+        reset(); // Reset form fields
+        setDateOfBirth(null); // Reset date picker
+        setEditingMember(null); // Clear editing state
+      } else {
+        const errorData = await response.json();
+        console.error("Failed to process member:", errorData.message || "Unknown error");
+        alert(`Failed to ${editingMember ? "update" : "add"} member. Please try again.`);
+      }
+    } catch (error) {
+      console.error("Error processing member:", error);
       alert(`Failed to ${editingMember ? "update" : "add"} member. Please try again.`);
     }
-  } catch (error) {
-    console.error("Error processing member:", error);
-    alert(`Failed to ${editingMember ? "update" : "add"} member. Please try again.`);
-  }
-};
-
+  };
 
   // Open Modal for Adding/Editing Member
   const handleOpenModal = (member: Member | null = null) => {
@@ -153,10 +153,17 @@ const Home: React.FC = () => {
     setDateOfBirth(null);
   };
 
-  // Fetch members on component mount or when search/filter changes
+  // Handle pagination
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page); // Update the current page
+    }
+  };
+
+  // Fetch members on component mount or when search/filter/pagination changes
   useEffect(() => {
     fetchMembers();
-  }, [searchQuery, filterCategory]);
+  }, [searchQuery, filterCategory, currentPage]);
 
   return (
     <div className="p-8">
@@ -239,6 +246,45 @@ const Home: React.FC = () => {
             )}
           </tbody>
         </table>
+      </div>
+
+      {/* Pagination */}
+      <div className="flex justify-center items-center gap-2 mt-4">
+        <button
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+          className={`px-4 py-2 rounded ${
+            currentPage === 1
+              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+              : "bg-blue-500 text-white hover:bg-blue-600"
+          }`}
+        >
+          Previous
+        </button>
+        {Array.from({ length: totalPages }, (_, index) => (
+          <button
+            key={index}
+            onClick={() => handlePageChange(index + 1)}
+            className={`px-4 py-2 rounded ${
+              currentPage === index + 1
+                ? "bg-blue-600 text-white"
+                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+            }`}
+          >
+            {index + 1}
+          </button>
+        ))}
+        <button
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className={`px-4 py-2 rounded ${
+            currentPage === totalPages
+              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+              : "bg-blue-500 text-white hover:bg-blue-600"
+          }`}
+        >
+          Next
+        </button>
       </div>
 
       {/* Modal */}
