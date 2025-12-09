@@ -165,13 +165,13 @@ const Home: React.FC = () => {
       const handle = setTimeout(() => {
         setDebouncedValue(value)
       }, delay)
-      return ()=>{
+      return () => {
         clearTimeout(handle)
       }
     }, [value, delay])
     return debouncedValue
   }
-  const debounceSearch = useDebounce(searchQuery,500)
+  const debounceSearch = useDebounce(searchQuery, 500)
 
   // Fetch members on component mount or when search/filter/pagination changes
   useEffect(() => {
@@ -267,8 +267,8 @@ const Home: React.FC = () => {
           onClick={() => handlePageChange(currentPage - 1)}
           disabled={currentPage === 1}
           className={`px-4 py-2 rounded ${currentPage === 1
-              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-              : "bg-blue-500 text-white hover:bg-blue-600"
+            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+            : "bg-blue-500 text-white hover:bg-blue-600"
             }`}
         >
           Previous
@@ -278,8 +278,8 @@ const Home: React.FC = () => {
             key={index}
             onClick={() => handlePageChange(index + 1)}
             className={`px-4 py-2 rounded ${currentPage === index + 1
-                ? "bg-blue-600 text-white"
-                : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+              ? "bg-blue-600 text-white"
+              : "bg-gray-200 text-gray-700 hover:bg-gray-300"
               }`}
           >
             {index + 1}
@@ -289,8 +289,8 @@ const Home: React.FC = () => {
           onClick={() => handlePageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
           className={`px-4 py-2 rounded ${currentPage === totalPages
-              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-              : "bg-blue-500 text-white hover:bg-blue-600"
+            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+            : "bg-blue-500 text-white hover:bg-blue-600"
             }`}
         >
           Next
@@ -298,110 +298,126 @@ const Home: React.FC = () => {
       </div>
 
       {/* Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex justify-center items-center z-50">
-          <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-lg">
-            <h2 className="text-2xl font-bold mb-6 text-gray-800 text-center">
-              {editingMember ? "Edit Member" : "Add Member"}
-            </h2>
-            <form onSubmit={handleSubmit(onSubmit)}>
-              {/* ID No */}
-              <div className="mb-6">
-                <label className="block font-medium text-gray-700 mb-2">ID No</label>
-                <input
-                  {...register("idNo", { required: true })}
-                  className="border border-gray-300 p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Enter ID No"
-                />
-              </div>
-
-              {/* Full Name */}
-              <div className="mb-6">
-                <label className="block font-medium text-gray-700 mb-2">Full Name</label>
-                <input
-                  {...register("fullName", { required: true })}
-                  className="border border-gray-300 p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Enter Full Name"
-                />
-              </div>
-
-              {/* Phone Number */}
-              <div className="mb-6">
-                <label className="block font-medium text-gray-700 mb-2">Phone Number</label>
-                <input
-                  {...register("phoneNumber", { required: true })}
-                  className="border border-gray-300 p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Enter Phone Number"
-                />
-              </div>
-
-              {/* Blood Group */}
-              <div className="mb-6">
-                <label className="block font-medium text-gray-700 mb-2">Blood Group</label>
-                <input
-                  {...register("bloodGroup")}
-                  className="border border-gray-300 p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Enter Blood Group"
-                />
-              </div>
-
-              {/* Present Address */}
-              <div className="mb-6">
-                <label className="block font-medium text-gray-700 mb-2">Present Address</label>
-                <input
-                  {...register("presentAddress")}
-                  className="border border-gray-300 p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Enter Address"
-                />
-              </div>
-
-              {/* Category */}
-              <div className="mb-6">
-                <label className="block font-medium text-gray-700 mb-2">Category</label>
-                <select
-                  {...register("category", { required: true })}
-                  className="border border-gray-300 p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option value="" disabled>
-                    Select Category
-                  </option>
-                  <option value="A">A</option>
-                  <option value="B">B</option>
-                </select>
-              </div>
-
-              {/* Date of Birth */}
-              <div className="mb-6">
-                <label className="block font-medium text-gray-700 mb-2">Date of Birth</label>
-                <DatePicker
-                  selected={dateOfBirth}
-                  onChange={(date) => setDateOfBirth(date)}
-                  className="border border-gray-300 p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                  placeholderText="Select Date"
-                  dateFormat="yyyy-MM-dd"
-                />
-              </div>
-
-              {/* Buttons */}
-              <div className="flex justify-end gap-4">
-                <button
-                  type="button"
-                  className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-400"
-                  onClick={handleCloseModal}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                >
-                  {editingMember ? "Update" : "Add"}
-                </button>
-              </div>
-            </form>
-          </div>
+     {isModalOpen && (
+  <div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex justify-center items-center z-50">
+    {/* Modal Container */}
+    <div className="bg-white p-4 sm:p-6 lg:p-8 rounded-lg shadow-lg w-[90%] sm:w-[80%] lg:w-[50%] max-w-lg mx-auto max-h-screen overflow-y-auto">
+      <h2 className="text-lg sm:text-xl lg:text-2xl font-bold mb-6 text-gray-800 text-center">
+        {editingMember ? "Edit Member" : "Add Member"}
+      </h2>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        {/* ID No */}
+        <div className="mb-4">
+          <label className="block font-medium text-gray-700 mb-2 text-sm sm:text-base lg:text-lg">
+            ID No
+          </label>
+          <input
+            {...register("idNo", { required: true })}
+            className="border border-gray-300 p-2 sm:p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base lg:text-lg"
+            placeholder="Enter ID No"
+          />
         </div>
-      )}
+
+        {/* Full Name */}
+        <div className="mb-4">
+          <label className="block font-medium text-gray-700 mb-2 text-sm sm:text-base lg:text-lg">
+            Full Name
+          </label>
+          <input
+            {...register("fullName", { required: true })}
+            className="border border-gray-300 p-2 sm:p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base lg:text-lg"
+            placeholder="Enter Full Name"
+          />
+        </div>
+
+        {/* Phone Number */}
+        <div className="mb-4">
+          <label className="block font-medium text-gray-700 mb-2 text-sm sm:text-base lg:text-lg">
+            Phone Number
+          </label>
+          <input
+            {...register("phoneNumber", { required: true })}
+            className="border border-gray-300 p-2 sm:p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base lg:text-lg"
+            placeholder="Enter Phone Number"
+          />
+        </div>
+
+        {/* Blood Group */}
+        <div className="mb-4">
+          <label className="block font-medium text-gray-700 mb-2 text-sm sm:text-base lg:text-lg">
+            Blood Group
+          </label>
+          <input
+            {...register("bloodGroup")}
+            className="border border-gray-300 p-2 sm:p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base lg:text-lg"
+            placeholder="Enter Blood Group"
+          />
+        </div>
+
+        {/* Present Address */}
+        <div className="mb-4">
+          <label className="block font-medium text-gray-700 mb-2 text-sm sm:text-base lg:text-lg">
+            Present Address
+          </label>
+          <input
+            {...register("presentAddress")}
+            className="border border-gray-300 p-2 sm:p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base lg:text-lg"
+            placeholder="Enter Address"
+          />
+        </div>
+
+        {/* Category */}
+        <div className="mb-4">
+          <label className="block font-medium text-gray-700 mb-2 text-sm sm:text-base lg:text-lg">
+            Category
+          </label>
+          <select
+            {...register("category", { required: true })}
+            className="border border-gray-300 p-2 sm:p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base lg:text-lg"
+          >
+            <option value="" disabled>
+              Select Category
+            </option>
+            <option value="A">A</option>
+            <option value="B">B</option>
+          </select>
+        </div>
+
+        {/* Date of Birth */}
+        <div className="mb-4">
+          <label className="block font-medium text-gray-700 mb-2 text-sm sm:text-base lg:text-lg">
+            Date of Birth
+          </label>
+          <DatePicker
+            selected={dateOfBirth}
+            onChange={(date) => setDateOfBirth(date)}
+            className="border border-gray-300 p-2 sm:p-3 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base lg:text-lg"
+            placeholderText="Select Date"
+            dateFormat="yyyy-MM-dd"
+          />
+        </div>
+
+        {/* Buttons */}
+        <div className="flex flex-col sm:flex-row justify-end gap-4">
+          <button
+            type="button"
+            className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-400 text-sm sm:text-base"
+            onClick={handleCloseModal}
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm sm:text-base"
+          >
+            {editingMember ? "Update" : "Add"}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+)}
+
 
       {/* Loading Spinner */}
       {isLoading && (
