@@ -1,9 +1,10 @@
 "use client";
-import React, { useState, useEffect, use } from "react";
+import React, { useState, useEffect, use,CSSProperties  } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { Autocomplete, TextField } from "@mui/material";
+import { ClipLoader, RingLoader } from "react-spinners";
 
 type Member = {
   idNo: string;
@@ -13,6 +14,11 @@ type Member = {
   presentAddress: string;
   category: "A" | "B";
   dob: string;
+};
+const override: CSSProperties = {
+  display: "block",
+  margin: "0 auto",
+  borderColor: "red",
 };
 
 const BASE_URL = "https://actor-ashy.vercel.app"; // Base URL for the API
@@ -34,10 +40,12 @@ const Home: React.FC = () => {
 
   const { register, handleSubmit, reset } = useForm<Member>();
   const [dateOfBirth, setDateOfBirth] = useState<Date | null>(null);
+  const [isLosding, setIsLoading] = useState(false);
 
   // Fetch members from the API using `fetch`
   const fetchMembers = async () => {
     try {
+      setIsLoading(true);
       const response = await fetch(
         `${BASE_URL}/api/v1/actors?page=${currentPage}&search=${searchQuery}&category=${filterCategory}`
       );
@@ -58,12 +66,15 @@ const Home: React.FC = () => {
         });
         setMembers(actors); // Assuming 'data' contains the members array
         setTotalPages(totalPage); // Assuming 'totalPages' is returned by the backend
+        setIsLoading(false);
       } else {
         console.log("data", data)
+         setIsLoading(false);
         console.error("Error fetching members:", data.message || "Unknown error");
         setMembers([]);
       }
     } catch (error) {
+      setIsLoading(false);
       console.error("Error fetching members:", error);
       setMembers([]);
     }
@@ -82,6 +93,7 @@ const Home: React.FC = () => {
     return debounceData
   }
   console.log(searchQuery)
+  console.log(isLosding)
   const debounceSearch = useDebounce(searchQuery, 500)
   console.log(debounceSearch)
   // Fetch paginated members from the API
@@ -535,7 +547,9 @@ const Home: React.FC = () => {
           </div>
         </div>
       )}
-
+{
+  isLosding && <RingLoader color={"#000000"} loading={isLosding} cssOverride={override} size={60} speedMultiplier={1} />
+}
     </div>
   );
 };
