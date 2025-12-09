@@ -30,6 +30,13 @@ const Home: React.FC = () => {
   const [dateOfBirth, setDateOfBirth] = useState<Date | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [editingMember, setEditingMember] = useState<Member | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterCategory, setFilterCategory] = useState<"A" | "B" | "">("");
+  const [actorCount, setActorCount] = useState({
+    categoryACount: 0,
+    categoryBCount: 0,
+    totalActor: 0,
+  });
 
   const { register, handleSubmit, reset, setValue, watch } = useForm<Member>();
 
@@ -40,10 +47,18 @@ const Home: React.FC = () => {
   const fetchMembers = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch(`${BASE_URL}/api/v1/actors`);
+      const response = await fetch(
+        `${BASE_URL}/api/v1/actors?search=${searchQuery}&category=${filterCategory}`
+      );
       const data = await response.json();
       if (response.ok) {
-        setMembers(data?.data?.actor || []);
+        const actors = data?.data?.actor || [];
+        const categoryACount = data?.data?.categoryACount || 0;
+        const categoryBCount = data?.data?.categoryBCount || 0;
+        const totalActor = data?.data?.totalActor || 0;
+
+        setActorCount({ categoryACount, categoryBCount, totalActor });
+        setMembers(actors);
         setIsLoading(false);
       } else {
         console.error("Error fetching members:", data.message || "Unknown error");
@@ -114,14 +129,38 @@ const Home: React.FC = () => {
     setDateOfBirth(null);
   };
 
-  // Fetch members on component mount
+  // Fetch members on component mount or when search/filter changes
   useEffect(() => {
     fetchMembers();
-  }, []);
+  }, [searchQuery, filterCategory]);
 
   return (
     <div className="p-8">
       <h1 className="text-2xl font-bold mb-4">Members Management</h1>
+
+      {/* Total Members */}
+      <div className="mb-4">
+        <p>Total Members: {actorCount?.totalActor}</p>
+        <p>Category A: {actorCount?.categoryACount}</p>
+        <p>Category B: {actorCount?.categoryBCount}</p>
+      </div>
+
+      {/* Search and Filter */}
+      <div className="flex gap-4 mb-4">
+        <input
+          type="text"
+          placeholder="Search by name"
+          className="border p-2 rounded w-full"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        <Autocomplete
+          options={["A", "B"]}
+          getOptionLabel={(option) => option}
+          renderInput={(params) => <TextField {...params} label="Filter by Category" />}
+          onChange={(e, value) => setFilterCategory(value as "A" | "B" | "")}
+        />
+      </div>
 
       {/* Add Member Button */}
       <button
