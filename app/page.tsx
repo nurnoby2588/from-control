@@ -412,7 +412,7 @@ const Home: React.FC = () => {
               <div className="mb-6">
                 <label className="block font-medium text-gray-700 mb-2">ID No</label>
                 <input
-                  value={editingMember?.idNo || ""}
+                  defaultValue={editingMember?.idNo || ""}
                   onChange={(e) =>
                     setEditingMember((prev) =>
                       prev ? { ...prev, idNo: e.target.value } : null
@@ -428,7 +428,7 @@ const Home: React.FC = () => {
               <div className="mb-6">
                 <label className="block font-medium text-gray-700 mb-2">Full Name</label>
                 <input
-                  value={editingMember?.fullName || ""}
+                  defaultValue={editingMember?.fullName || ""}
                   onChange={(e) =>
                     setEditingMember((prev) =>
                       prev ? { ...prev, fullName: e.target.value } : null
@@ -444,7 +444,7 @@ const Home: React.FC = () => {
               <div className="mb-6">
                 <label className="block font-medium text-gray-700 mb-2">Phone Number</label>
                 <input
-                  value={editingMember?.phoneNumber || ""}
+                  defaultValue={editingMember?.phoneNumber || ""}
                   onChange={(e) =>
                     setEditingMember((prev) =>
                       prev ? { ...prev, phoneNumber: e.target.value } : null
@@ -460,7 +460,7 @@ const Home: React.FC = () => {
               <div className="mb-6">
                 <label className="block font-medium text-gray-700 mb-2">Blood Group</label>
                 <input
-                  value={editingMember?.bloodGroup || ""}
+                  defaultValue={editingMember?.bloodGroup || ""}
                   onChange={(e) =>
                     setEditingMember((prev) =>
                       prev ? { ...prev, bloodGroup: e.target.value } : null
@@ -475,7 +475,7 @@ const Home: React.FC = () => {
               <div className="mb-6">
                 <label className="block font-medium text-gray-700 mb-2">Present Address</label>
                 <input
-                  value={editingMember?.presentAddress || ""}
+                  defaultValue={editingMember?.presentAddress || ""}
                   onChange={(e) =>
                     setEditingMember((prev) =>
                       prev ? { ...prev, presentAddress: e.target.value } : null
@@ -490,7 +490,7 @@ const Home: React.FC = () => {
               <div className="mb-6">
                 <label className="block font-medium text-gray-700 mb-2">Category</label>
                 <select
-                  value={editingMember?.category || ""}
+                  defaultValue={editingMember?.category || ""}
                   onChange={(e) =>
                     setEditingMember((prev) =>
                       prev ? { ...prev, category: e.target.value as "A" | "B" } : null
