@@ -74,48 +74,59 @@ const Home: React.FC = () => {
   };
   // Handle form submission
   const onSubmit: SubmitHandler<Member> = async (data) => {
-    try {
-      const newMember = {
-        ...data,
-        dob: dateOfBirth ? dateOfBirth.toISOString().split("T")[0] : "", // Convert date to string
-      };
-      let response;
-      if (editingMember) {
-        response = await fetch(`${BASE_URL}/api/v1/admin/update-actor/${editingMember?._id}`, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(newMember),
-        });
-      }
+  try {
+    // Prepare the member object with the date of birth
+    const newMember = {
+      ...data,
+      dob: dateOfBirth ? dateOfBirth.toISOString().split("T")[0] : editingMember?.dob || "", // Use existing dob if editing
+    };
 
-      else {
-        response = await fetch(`${BASE_URL}/api/v1/admin/add-actor`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(newMember),
-        });
-      }
+    let response;
 
-      if (response.ok) {
-        fetchMembers(); // Refresh the members list
-        alert("Member added successfully!");
-        setIsModalOpen(false);
-        reset(); // Reset form fields
-        setDateOfBirth(null); // Reset date picker
-      } else {
-        const errorData = await response.json();
-        console.error("Failed to add member:", errorData.message || "Unknown error");
-        alert("Failed to add member. Please try again.");
-      }
-    } catch (error) {
-      console.error("Error adding member:", error);
-      alert("Failed to add member. Please try again.");
+    // Check if editing or adding a member
+    if (editingMember) {
+      // Update existing member
+      response = await fetch(`${BASE_URL}/api/v1/admin/update-actor/${editingMember._id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newMember),
+      });
+    } else {
+      // Add new member
+      response = await fetch(`${BASE_URL}/api/v1/admin/add-actor`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newMember),
+      });
     }
-  };
+
+    // Handle response
+    if (response.ok) {
+      fetchMembers(); // Refresh the members list
+      if (editingMember) {
+        alert("Member updated successfully!");
+      } else {
+        alert("Member added successfully!");
+      }
+      setIsModalOpen(false); // Close modal
+      reset(); // Reset form fields
+      setDateOfBirth(null); // Reset date picker
+      setEditingMember(null); // Clear editing state
+    } else {
+      const errorData = await response.json();
+      console.error("Failed to process member:", errorData.message || "Unknown error");
+      alert(`Failed to ${editingMember ? "update" : "add"} member. Please try again.`);
+    }
+  } catch (error) {
+    console.error("Error processing member:", error);
+    alert(`Failed to ${editingMember ? "update" : "add"} member. Please try again.`);
+  }
+};
+
 
   // Open Modal for Adding/Editing Member
   const handleOpenModal = (member: Member | null = null) => {
