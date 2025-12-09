@@ -159,11 +159,24 @@ const Home: React.FC = () => {
       setCurrentPage(page); // Update the current page
     }
   };
+  const useDebounce = (value: string, delay: number) => {
+    const [debouncedValue, setDebouncedValue] = useState(value);
+    useEffect(() => {
+      const handle = setTimeout(() => {
+        setDebouncedValue(value)
+      }, delay)
+      return ()=>{
+        clearTimeout(handle)
+      }
+    }, [value, delay])
+    return debouncedValue
+  }
+  const debounceSearch = useDebounce(searchQuery,500)
 
   // Fetch members on component mount or when search/filter/pagination changes
   useEffect(() => {
     fetchMembers();
-  }, [searchQuery, filterCategory, currentPage]);
+  }, [debounceSearch, filterCategory, currentPage]);
 
   return (
     <div className="p-8">
@@ -253,11 +266,10 @@ const Home: React.FC = () => {
         <button
           onClick={() => handlePageChange(currentPage - 1)}
           disabled={currentPage === 1}
-          className={`px-4 py-2 rounded ${
-            currentPage === 1
+          className={`px-4 py-2 rounded ${currentPage === 1
               ? "bg-gray-300 text-gray-500 cursor-not-allowed"
               : "bg-blue-500 text-white hover:bg-blue-600"
-          }`}
+            }`}
         >
           Previous
         </button>
@@ -265,11 +277,10 @@ const Home: React.FC = () => {
           <button
             key={index}
             onClick={() => handlePageChange(index + 1)}
-            className={`px-4 py-2 rounded ${
-              currentPage === index + 1
+            className={`px-4 py-2 rounded ${currentPage === index + 1
                 ? "bg-blue-600 text-white"
                 : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-            }`}
+              }`}
           >
             {index + 1}
           </button>
@@ -277,11 +288,10 @@ const Home: React.FC = () => {
         <button
           onClick={() => handlePageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
-          className={`px-4 py-2 rounded ${
-            currentPage === totalPages
+          className={`px-4 py-2 rounded ${currentPage === totalPages
               ? "bg-gray-300 text-gray-500 cursor-not-allowed"
               : "bg-blue-500 text-white hover:bg-blue-600"
-          }`}
+            }`}
         >
           Next
         </button>
